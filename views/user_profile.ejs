@@ -19,6 +19,26 @@
             <li>
                 <a href="/users/profile/<%= profile_user.id %>"><%= profile_user.name %></a>
             </li>
+            <% if (user && user.id !== profile_user.id) { %>
+                <% if (profile_user.friends && profile_user.friends.includes(user.id)) { %>
+                    <form action="/users/remove-friend/<%= profile_user.id %>" method="POST">
+                        <button type="submit">Remove Friend</button>
+                    </form>
+                <% } else if (profile_user.friendRequests && profile_user.friendRequests.includes(user.id)) { %>
+                    <span>Request Sent</span>
+                <% } else if (user.friendRequests && user.friendRequests.includes(profile_user.id)) { %>
+                    <form action="/users/accept-request/<%= profile_user.id %>" method="POST">
+                        <button type="submit">Accept</button>
+                    </form>
+                    <form action="/users/reject-request/<%= profile_user.id %>" method="POST">
+                        <button type="submit">Reject</button>
+                    </form>
+                <% } else { %>
+                    <form action="/users/send-request/<%= profile_user.id %>" method="POST">
+                        <button type="submit">Send Friend Request</button>
+                    </form>
+                <% } %>
+            <% } %>
             <% if (user && user.id === profile_user.id) { %>
                 <!-- Show the form if the logged-in user matches the profile_user -->
                 <form action="/users/update/<%= profile_user.id %>" enctype="multipart/form-data" method="POST">
@@ -32,6 +52,38 @@
                 <a href="/users/sign-out">Sign Out</a>
             </li>
         </ul>
+        <% if (user && user.id === profile_user.id) { %>
+            <h3>Friends</h3>
+            <ul>
+                <% if (user.friends && user.friends.length > 0) { %>
+                    <% user.friends.forEach(function(friendId) { %>
+                        <li><a href="/users/profile/<%= friendId %>">Friend: <%= friendId %></a></li>
+                    <% }); %>
+                <% } else { %>
+                    <li>No friends yet.</li>
+                <% } %>
+            </ul>
+            <h3>Pending Friend Requests</h3>
+            <ul>
+                <% if (user.friendRequests && user.friendRequests.length > 0) { %>
+                    <% user.friendRequests.forEach(function(requestId) { %>
+                        <li><a href="/users/profile/<%= requestId %>">Request from: <%= requestId %></a></li>
+                    <% }); %>
+                <% } else { %>
+                    <li>No pending requests.</li>
+                <% } %>
+            </ul>
+            <h3>Sent Friend Requests</h3>
+            <ul>
+                <% if (user.sentRequests && user.sentRequests.length > 0) { %>
+                    <% user.sentRequests.forEach(function(sentId) { %>
+                        <li><a href="/users/profile/<%= sentId %>">Sent to: <%= sentId %></a></li>
+                    <% }); %>
+                <% } else { %>
+                    <li>No sent requests.</li>
+                <% } %>
+            </ul>
+        <% } %>
     <% } else { %>
         <p>User profile not found.</p>
         <ul>

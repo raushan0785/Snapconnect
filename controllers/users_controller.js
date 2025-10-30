@@ -91,11 +91,7 @@ module.exports.create = function (req, res) {
             if (!existingUser) {
                 // Create the user
                 return User.create(req.body)
-                    .then(() => res.redirect('/users/sign-in'))
-                    .catch((err) => {
-                        console.log('Error during user creation:', err);
-                        return res.redirect('back');
-                    });
+                    .then(() => res.redirect('/'));
             } else {
                 return res.redirect('back');
             }
@@ -109,7 +105,7 @@ module.exports.create = function (req, res) {
 // Handle user login and create a session
 module.exports.createsession = function (req, res) {
     req.flash('success','logged in successfully');
-    return res.redirect(`/users/profile/${req.user.id}`);
+    return res.redirect('/');
 };
 
 // Handle user logout and destroy the session
@@ -122,4 +118,68 @@ module.exports.destroysession = function (req, res, next) {
         }
         return res.redirect('/');
     });
+};
+
+module.exports.sendFriendRequest = async function(req, res) {
+    try {
+        let targetUser = await User.findById(req.params.id);
+        let currentUser = await User.findById(req.user.id);
+        if (!targetUser.friendRequests.includes(currentUser.id) && !targetUser.friends.includes(currentUser.id)) {
+            targetUser.friendRequests.push(currentUser.id);
+            currentUser.sentRequests.push(targetUser.id);
+            await targetUser.save();
+            await currentUser.save();
+        }
+        return res.redirect('back');
+    } catch (err) {
+        console.log(err);
+        return res.redirect('back');
+    }
+};
+
+module.exports.acceptFriendRequest = async function(req, res) {
+    try {
+        let currentUser = await User.findById(req.user.id);
+        let sender = await User.findById(req.params.id);
+        currentUser.friendRequests.pull(sender.id);
+        sender.sentRequests.pull(currentUser.id);
+        currentUser.friends.push(sender.id);
+        sender.friends.push(currentUser.id);
+        await currentUser.save();
+        await sender.save();
+        return res.redirect('back');
+    } catch (err) {
+        console.log(err);
+        return res.redirect('back');
+    }
+};
+
+module.exports.rejectFriendRequest = async function(req, res) {
+    try {
+        let currentUser = await User.findById(req.user.id);
+        let sender = await User.findById(req.params.id);
+        currentUser.friendRequests.pull(sender.id);
+        sender.sentRequests.pull(currentUser.id);
+        await currentUser.save();
+        await sender.save();
+        return res.redirect('back');
+    } catch (err) {
+        console.log(err);
+        return res.redirect('back');
+    }
+};
+
+module.exports.removeFriend = async function(req, res) {
+    try {
+        let currentUser = await User.findById(req.user.id);
+        let friend = await User.findById(req.params.id);
+        currentUser.friends.pull(friend.id);
+        friend.friends.pull(currentUser.id);
+        await currentUser.save();
+        await friend.save();
+        return res.redirect('back');
+    } catch (err) {
+        console.log(err);
+        return res.redirect('back');
+    }
 };

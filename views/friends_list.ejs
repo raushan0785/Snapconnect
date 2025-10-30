@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/layout.css">
+</head>
+<body>
+    <h1>Friends</h1>
+    
+    <% if (friends && friends.length > 0) { %>
+        <ul>
+            <% friends.forEach(function(friend) { %>
+                <li>
+                    <a href="/chat/history/<%= friend.id %>">
+                        <%= friend.name %>
+                    </a>
+                </li>
+            <% }); %>
+        </ul>
+    <% } else { %>
+        <p>No friends yet. Add some friends to start chatting!</p>
+    <% } %>
+    
+    <p><a href="/">Back to Home</a></p>
+</body>
+</html> 

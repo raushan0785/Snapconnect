@@ -72,48 +72,127 @@
         </ul>
     </div>
 </section> -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="stylesheet" href="/css/home.css">
+</head>
 
-
-    
-
-
-<link rel="stylesheet" href="/css/home.css"></head>
 <body>
-<div id="home-container">
-<section id="feed-posts">
-    <h4>Posts</h4>
-    <% if(locals.user){ %>
-    <form action="/posts/create" id="new-post-form" method="POST">
-        <textarea name="content" cols="30" rows="3" placeholder="Type Here..." required></textarea>
-        <input type="submit" value="Post">
-    </form>
+  <div id="home-container">
+
+    <!-- ==========================
+         POST SECTION
+    =========================== -->
+    <section id="feed-posts">
+      <h4>Posts</h4>
+
+      <% if (locals.user) { %>
+        <form action="/posts/create" id="new-post-form" method="POST" enctype="multipart/form-data">
+          <textarea name="content" cols="30" rows="3" placeholder="Type Here..." required></textarea>
+          <input type="file" name="image" accept="image/*">
+          <input type="submit" value="Post">
+        </form>
+      <% } %>
+
+      <div id="posts-list-container">
+        <ul>
+          <% if (posts && posts.length > 0) { %>
+            <% posts.forEach(function(post) { %>
+              <li>
+                <p>
+                  <% if (locals.user && locals.user.id == post.user.id) { %>
+                    <small>
+                      <a href="/posts/destroy/<%= post.id %>">X</a>
+                    </small>
+                  <% } %>
+
+                  <%= post.content %><br>
+
+                  <% if (post.image) { %>
+                    <img src="<%= post.image %>" alt="Post Image" style="max-width: 300px; height: auto;"><br>
+                  <% } %>
+
+                  <small>Posted by: <%= post.user.name %></small>
+                </p>
+              </li>
+            <% }); %>
+          <% } else { %>
+            <li>No posts yet.</li>
+          <% } %>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ==========================
+         FRIENDS SECTION
+    =========================== -->
+    <section id="user-friends">
+      <h4>Friends</h4>
+      <% if (all_users && all_users.length > 0) { %>
+        <% all_users.forEach(function(u) { %>
+          <p>
+            <a href="/users/profile/<%= u.id %>"><%= u.name %></a>
+          </p>
+        <% }); %>
+      <% } else { %>
+        <p>No friends found.</p>
+      <% } %>
+    </section>
+
+    <!-- ==========================
+         ALL USERS SECTION
+    =========================== -->
+    <h2>All Users</h2>
+    <ul>
+      <% if (all_users && all_users.length > 0) { %>
+        <% all_users.forEach(function(u) { %>
+          <li>
+            <a href="/users/profile/<%= u.id %>"><%= u.name %></a>
+          </li>
+        <% }); %>
+      <% } else { %>
+        <li>No users found.</li>
+      <% } %>
+    </ul>
+
+    <!-- ==========================
+         PENDING FRIEND REQUESTS
+    =========================== -->
+    <% var safeUser = typeof user !== 'undefined' ? user : null; %>
+    <% if (safeUser && safeUser.friendRequests && safeUser.friendRequests.length > 0) { %>
+      <h3>Pending Friend Requests</h3>
+      <ul>
+        <% safeUser.friendRequests.forEach(function(requestId) { %>
+          <li>
+            <a href="/users/profile/<%= requestId %>">Request from: <%= requestId %></a>
+            <form action="/users/accept-request/<%= requestId %>" method="POST" style="display:inline;">
+              <button type="submit">Accept</button>
+            </form>
+            <form action="/users/reject-request/<%= requestId %>" method="POST" style="display:inline;">
+              <button type="submit">Reject</button>
+            </form>
+          </li>
+        <% }); %>
+      </ul>
     <% } %>
 
-    <div id="posts-list-container">
-        <ul>
-            <% for(post of posts){ %>
-                
-            <%- include('_post') -%>
-                
-            <%} %>
-        </ul>
-    </div>
-</section>
-<section id="user-friends">
-    <h4>Friends</h4>
-    <%for(u of all_users){%>
+    <!-- ==========================
+         USER PROFILE FOOTER
+    =========================== -->
+    <% if (safeUser) { %>
+      <footer style="margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px;">
+        <h4>Your Profile</h4>
         <p>
-            <a href="/users/profile/<%=u.id%>"><%=u.name%></a>
-            </p>
-            <%}%>
-        </section>
-        </div>
-        </body>
-        </html>
+          <a href="/users/profile/<%= safeUser.id %>"><%= safeUser.name %></a>
+        </p>
+      </footer>
+    <% } %>
+
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/layout.css">
+    <style>
+        .chat-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .message.sent {
+            background-color: #007bff;
+            color: white;
+            text-align: right;
+        }
+        .message.received {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+        .message-form {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        .message-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .send-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .send-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Chat with <%= friend.name %></h1>
+        
+        <div id="messages">
+            <% if (messages && messages.length > 0) { %>
+                <% messages.forEach(function(msg) { %>
+                    <div class="message <%= msg.sender.id === user.id ? 'sent' : 'received' %>">
+                        <strong><%= msg.sender.name %>:</strong>
+                        <%= msg.message %>
+                        <br>
+                        <small><%= new Date(msg.createdAt).toLocaleString() %></small>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <p>No messages yet. Start the conversation!</p>
+            <% } %>
+        </div>
+        
+        <form class="message-form" action="/chat/send" method="POST">
+            <input type="hidden" name="receiverId" value="<%= friend.id %>">
+            <input type="text" name="message" class="message-input" placeholder="Type your message..." required>
+            <button type="submit" class="send-button">Send</button>
+        </form>
+        
+        <p><a href="/chat/friends">Back to Friends</a></p>
+        <p><a href="/">Back to Home</a></p>
+    </div>
+</body>
+</html> 

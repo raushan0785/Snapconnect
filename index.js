@@ -10,7 +10,7 @@ const passportLocal = require('./config/passport-local-strategy');
 const passportJWT = require('./config/passport-jwt-strategy');
 const passportGoogle = require('./config/passport-google-oauth2-strategy');
 const MongoStore = require('connect-mongo');
-const sassMiddleware = require('node-sass-middleware');
+const sassMiddleware = require('sass-middleware');
 const flash=require('connect-flash');
 const customMware=require('./config/middleware');
 const router=express.Router();
@@ -29,10 +29,10 @@ app.use(
 app.use(express.urlencoded());
 app.use(cookieParser());
 app.use(express.static('./assets'));
+app.use('/uploads', express.static(__dirname + '/uploads'));
 app.use('/css', express.static('./assets/css'));
 
 app.use(expressLayouts);
-app.use('/uploads', express.static(__dirname + '/uploads'));
 // Extract style and scripts from sub-pages into the layout
 app.set('layout extractStyles', true);
 app.set('layout extractScripts', true);
