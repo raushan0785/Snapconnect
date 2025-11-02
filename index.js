@@ -44,14 +44,14 @@ app.set('views', './views');
 // Session configuration using MongoDB store
 app.use(session({
     name: 'codeial',
-    secret: process.env.SESSION_SECRET || 'your_secret_key', // Use an environment variable for secret
+    secret: process.env.SESSION_SECRET, // Use an environment variable for secret
     saveUninitialized: false,
     resave: false,
     cookie: {
         maxAge: (1000 * 60 * 100) // Session expiry time
     },
     store: new MongoStore({
-        mongoUrl: process.env.MONGO_URI || 'mongodb://localhost:27017/codeial', // Ensure correct MongoDB URL
+        mongoUrl: process.env.MONGO_URI, // Ensure correct MongoDB URL
         autoRemove: 'disabled'
     }, function (err) {
         console.log(err || 'connect-mongodb setup ok');
